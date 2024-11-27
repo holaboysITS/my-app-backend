@@ -1,6 +1,5 @@
 from dataclasses import Field
-from enum import Enum
-from typing import Annotated, Optional
+from typing import Optional
 from requests import Session, session
 from bson import ObjectId
 from pydantic import BaseModel, field_validator, validator
