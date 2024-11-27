@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException, Body, status, Query
 from bson import ObjectId
 from db import user_collection, machinery_collection, plant_collection
-from basemodel import User, Plant, Machinery
-from basemodel.User import User, UserResponse
+from basemodel.Plant import Plant
+from basemodel.Machinery import Machinery
+from basemodel.UserResponse import UserResponse
+from basemodel.User import User
 
 router = APIRouter()
 
@@ -79,5 +81,37 @@ def read_user(input: User):
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     response = UserResponse(username=user['username'])
+    
+    return response
+
+@router.post("/plants/", response_model=Plant, status_code=status.HTTP_200_OK)
+def read_plant(input:Plant):
+    
+    name = input.name
+    location = input.location
+    description = input.description
+    machineries = input.machineries
+    
+    plant = plant_collection.find_one({'Plant name': name, 'location':location, 'description': description, 'machineries': machineries})
+    
+    if plant is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plant not found")
+    response = Plant(name= plant['name'], location= plant['location'], description = plant['description'], machineries = plant['machineries'])
+    
+    return response
+
+@router.post("/machinaries/", response_model=Machinery, status_code=status.HTTP_200_OK)
+def read_machineries(input:Machinery):
+    
+    plant_id = input.plant_id
+    name = input.name
+    type = input.type
+    specifications = input.specifications
+    
+    machinery= machinery_collection.find_one({'plant_id': plant_id, 'name': name, 'type':type, 'specifications': specifications})
+    
+    if machinery is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plant not found")
+    response = Machinery(plant_id=machinery['plant_id'],name= machinery['name'], type=machinery['type'], specifications=machinery['specifications'])
     
     return response
