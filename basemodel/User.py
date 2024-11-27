@@ -1,11 +1,9 @@
 from pydantic import BaseModel, field_validator
 
-from basemodel.enums.Role import Role
 
 class User(BaseModel):
     username: str
     password: str
-    role: Role
     
     @field_validator('username')
     def check_name(cls, v):
