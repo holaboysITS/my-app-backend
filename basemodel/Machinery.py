@@ -15,27 +15,27 @@ class Machinery(BaseModel):
     @field_validator('name')
     def check_name(cls, v):
         
-        if v!=None:
+        if v==None or v=='':
             raise ValueError("Non trovo il nome")
         return v    
     
     @field_validator('type')
     def check_name(cls, v):
         
-        if v!=None:
+        if v==None or v=='':
             raise ValueError("Non trovo il tipo")
         return v
     
     # @field_validator('status')
     # def check_name(cls, v):
         
-    #     if v!=None:
-    #         raise ValueError("Non capisco in che stato sia")
-    #     return v
+        if v==None or v=='':
+            raise ValueError("Non capisco in che stato sia")
+        return v
     
     @field_validator('specifications')
     def check_name(cls, v):
         
-        if v!=None:
+        if v==None or v=='':
             raise ValueError("Non trovo le specifiche")
         return v
