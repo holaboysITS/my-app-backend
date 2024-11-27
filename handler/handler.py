@@ -7,11 +7,12 @@ from basemodel.User import User, UserResponse
 router = APIRouter()
 
 # Utility function to convert MongoDB ObjectId to str
-def convert_objectid_to_str(user_data):
-    if user_data:
-        user_data['id'] = str(user_data['_id'])  # Convert ObjectId to str
-        del user_data['_id']  # Optional: remove the _id field if not needed
-    return user_data
+def convert_objectid_to_str(data):
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, ObjectId):
+                data[key] = str(value)  # Convert ObjectId to string
+    return data
 
 # # POST Route to create a new user
 # @router.post(
@@ -67,13 +68,16 @@ def convert_objectid_to_str(user_data):
 #     return [convert_objectid_to_str(plant) for plant in plants]  # Convert ObjectId to str for each plant
 
 # GET Route to read a specific user by username and password
-@router.get("/user/", response_model=UserResponse, status_code=status.HTTP_200_OK)
-def read_user(username: str = Query(...), password: str = Query(...)):
-    user = user_collection.find_one({"username": 'admin', "password": 'test1234'})
+@router.post("/user/", response_model=UserResponse, status_code=status.HTTP_200_OK)
+def read_user(input: User):
+
+    username = input.username
+    password = input.password
+    user = user_collection.find_one({"username": username, "password": password})
+    user = convert_objectid_to_str(user)
 
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-    # Convert ObjectId to str for UserResponse
-    user_response = UserResponse(**convert_objectid_to_str(user))
-    return user_response
+    response = UserResponse(username=user['username'])
+    
+    return response
