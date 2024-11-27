@@ -1,5 +1,5 @@
 import asyncio
-from db import user_collection
+from db import user_collection, plant_collection, machinery_collection
 
 async def test_connection():
     user = await user_collection.find_one({})
