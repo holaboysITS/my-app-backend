@@ -19,9 +19,10 @@ app = FastAPI(
 )
 
 # Decoratori per definire una rota
+origins = ['*']
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # List of origins allowed to access the API
+    allow_origins=origins,  # List of origins allowed to access the API
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE)
     allow_headers=["*"],  # Allow all headers
