@@ -130,21 +130,21 @@ async def get_machineries_by_id(machinery_id: str):
 
 #GET LIST DEI MACCHINARI DI UN IMPIANTO
 @router.get(
-    "/machineries/{plant_id}",
+    "/machineries/{plant_id}/plant",
     response_description="List all machineries from a plant",
-    response_model=List[MachineryResponse],
+    response_model=List[Machinery],
     response_model_by_alias=True,
 )
 async def list_machineries(plant_id: str):
     
     try:
-        plant_id = ObjectId(plant_id)
+        plant_id_format = ObjectId(plant_id)
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid ObjectId format")
     machineries = list(machinery_collection.find({"plant_id": plant_id}).to_list(1000))
-    
-    if machineries is None:
-        raise HTTPException(status_code=404, detail="Machinary not found")
+
+    if not machineries:
+        raise HTTPException(status_code=404, detail="Patatina")
     return machineries
 
 #PUT DI UN MACCHINARIO
@@ -176,7 +176,7 @@ async def update_machinery(machinery_id: str, machinery: Machinery ):
 @router.get(
     "/machineries",
     response_description="List of all machineries",
-    response_model=List[Machinery],
+    response_model=List[MachineryResponse],
     response_model_by_alias=True,
 )
 async def list_machineries():

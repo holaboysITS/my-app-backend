@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from pymongo.collection import Collection
 from pymongo import MongoClient
 
+
 load_dotenv()
 
 client = MongoClient(os.getenv("MONGODB_URI_OFF"))
