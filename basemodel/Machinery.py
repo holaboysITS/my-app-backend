@@ -1,7 +1,7 @@
 from bson import ObjectId
 from pydantic import BaseModel, Field,field_validator
 from typing import Optional,Annotated
-# from enums import Status
+from basemodel.enums.Status import Status
 
 class Machinery(BaseModel):
     # id: Optional[ObjectId] = Field(alias="_id", default=None)
@@ -9,7 +9,7 @@ class Machinery(BaseModel):
     
     name : str
     type : str
-    # status : Status
+    status : Status
     specifications : dict
     
     @field_validator('name')
@@ -20,21 +20,21 @@ class Machinery(BaseModel):
         return v    
     
     @field_validator('type')
-    def check_name(cls, v):
+    def check_type(cls, v):
         
         if v==None or v=='':
             raise ValueError("Non trovo il tipo")
         return v
     
-    # @field_validator('status')
-    # def check_name(cls, v):
+    @field_validator('status')
+    def check_status(cls, v):
         
         if v==None or v=='':
             raise ValueError("Non capisco in che stato sia")
         return v
     
     @field_validator('specifications')
-    def check_name(cls, v):
+    def check_specifications(cls, v):
         
         if v==None or v=='':
             raise ValueError("Non trovo le specifiche")

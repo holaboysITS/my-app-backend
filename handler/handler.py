@@ -5,6 +5,7 @@ from basemodel.Plant import Plant
 from basemodel.Machinery import Machinery
 from basemodel.UserResponse import UserResponse
 from basemodel.User import User
+from typing import List
 
 router = APIRouter()
 
@@ -15,6 +16,38 @@ def convert_objectid_to_str(data):
             if isinstance(value, ObjectId):
                 data[key] = str(value)  # Convert ObjectId to string
     return data
+
+# POST DI UN IMPIANTO
+@router.post(
+    "/plants",
+    response_description="Add new plant",
+    response_model=Plant,
+    status_code=status.HTTP_200_OK,
+)
+async def create_plant(plant: Plant = Body(...)):
+    new_plant = plant_collection.insert_one(
+        plant.model_dump(exclude=["id"], by_alias=True)  # Exclude 'id' for insertion
+    )
+    created_plant = plant_collection.find_one({"_id": new_plant.inserted_id})
+    return created_plant
+
+
+#GET LIST DEGLI IMPIANTI
+@router.get(
+    "/plants",
+    response_description="List all students",
+    response_model=List[Plant],
+    response_model_by_alias=False,
+)
+async def list_plants():
+    
+    return list(plant_collection.find().to_list(1000))
+
+
+
+
+
+
 
 # # POST Route to create a new user
 # @router.post(
@@ -32,32 +65,19 @@ def convert_objectid_to_str(data):
 #     return convert_objectid_to_str(created_user)  # Convert ObjectId to str before returning
 
 # # POST Route to create new machinery
-# @router.post(
-#     "/machinery",
-#     response_description="Add new machinery",
-#     response_model=Machinery,
-#     status_code=status.HTTP_201_CREATED,
-# )
-# def create_machinery(machinery: Machinery = Body(...)):
-#     new_machinery = machinery_collection.insert_one(
-#         machinery.dict(exclude={"id"})  # Exclude 'id' for insertion
-#     )
-#     created_machinery = machinery_collection.find_one({"_id": new_machinery.inserted_id})
-#     return convert_objectid_to_str(created_machinery)
+@router.post(
+    "/plants/{plants_id}/machinery",
+    response_description="Add new machinery",
+    response_model=Machinery,
+    status_code=status.HTTP_200_OK,
+)
+def create_machinery(machinery: Machinery = Body(...)):
+    new_machinery = machinery_collection.insert_one(
+        machinery.model_dump(exclude=["id"], by_alias=True)  # Exclude 'id' for insertion
+    )
+    created_machinery = machinery_collection.find_one({"_id": new_machinery.inserted_id})
+    return created_machinery
 
-# # POST Route to create new plant
-# @router.post(
-#     "/plant",
-#     response_description="Add new plant",
-#     response_model=Plant,
-#     status_code=status.HTTP_201_CREATED,
-# )
-# def create_plant(plant: Plant = Body(...)):
-#     new_plant = plant_collection.insert_one(
-#         plant.dict(exclude={"id"})  # Exclude 'id' for insertion
-#     )
-#     created_plant = plant_collection.find_one({"_id": new_plant.inserted_id})
-#     return convert_objectid_to_str(created_plant)
 
 # # GET Route to list all plants (asynchronous)
 # # @router.get(
@@ -84,21 +104,21 @@ def read_user(input: User):
     
     return response
 
-@router.post("/plants/", response_model=Plant, status_code=status.HTTP_200_OK)
-def read_plant(input:Plant):
+# @router.post("/plants/", response_model=Plant, status_code=status.HTTP_200_OK)
+# def read_plant(input:Plant):
     
-    name = input.name
-    location = input.location
-    description = input.description
-    machineries = input.machineries
+#     name = input.name
+#     location = input.location
+#     description = input.description
+#     machineries = input.machineries
     
-    plant = plant_collection.find_one({'Plant name': name, 'location':location, 'description': description, 'machineries': machineries})
+#     plant = plant_collection.find_one({'Plant name': name, 'location':location, 'description': description, 'machineries': machineries})
     
-    if plant is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plant not found")
-    response = Plant(name= plant['name'], location= plant['location'], description = plant['description'], machineries = plant['machineries'])
+#     if plant is None:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plant not found")
+#     response = Plant(name= plant['name'], location= plant['location'], description = plant['description'], machineries = plant['machineries'])
     
-    return response
+#     return response
 
 @router.post("/machinaries/", response_model=Machinery, status_code=status.HTTP_200_OK)
 def read_machineries(input:Machinery):
@@ -116,4 +136,14 @@ def read_machineries(input:Machinery):
     
     return response
 
-#@router.post("/")
+# @router.post("/plants")
+# async def create_plant(input:Plant):
+    
+#     name = input.name
+#     location = input.location
+#     description = input.description
+    
+#     plant = Plant(name=name, location=location, description=description, machineries=input.machineries)
+    
+    
+    
