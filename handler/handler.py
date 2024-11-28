@@ -241,7 +241,7 @@ def read_user(input: User):
     return response
 
 @router.get(
-    "/user",
+    "/allUser",
     response_model=List[UserResponse],
     status_code=status.HTTP_200_OK,
     response_model_by_alias=True,
