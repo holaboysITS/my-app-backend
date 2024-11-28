@@ -5,7 +5,7 @@ from typing import Optional,Annotated
 
 class Machinery(BaseModel):
     # id: Optional[ObjectId] = Field(alias="_id", default=None)
-    plant_id: int 
+    plant_id: str
     
     name : str
     type : str

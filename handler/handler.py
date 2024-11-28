@@ -115,3 +115,5 @@ def read_machineries(input:Machinery):
     response = Machinery(plant_id=machinery['plant_id'],name= machinery['name'], type=machinery['type'], specifications=machinery['specifications'])
     
     return response
+
+#@router.post("/")
