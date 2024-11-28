@@ -7,7 +7,7 @@ class User(BaseModel):
     password: str
     
     @field_validator('username')
-    def check_name(cls, v):
+    def check_username(cls, v):
         
         if v==None or v=='':
             raise ValueError("Lo username non può essere vuoto")
@@ -18,7 +18,7 @@ class User(BaseModel):
         return v 
     
     @field_validator('password')
-    def check_name(cls, v):
+    def check_password(cls, v):
         
         if v==None or v=='':
             raise ValueError("La password non può essere vuota")

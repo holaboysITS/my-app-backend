@@ -4,7 +4,7 @@ from requests import Session, session
 from bson import ObjectId
 from pydantic import BaseModel, Field,field_validator, validator
 
-from basemodel.Machinery import Machinery     
+from basemodel.Machinery import Machinery ,MachineryResponse    
 
 class Plant(BaseModel):
     #id: str = Field(alias="_id", default=None)
