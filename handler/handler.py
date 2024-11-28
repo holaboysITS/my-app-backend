@@ -32,6 +32,21 @@ async def create_plant(plant: Plant = Body(...)):
     return created_plant
 
 
+#GET UN IMPIANTO
+@router.get(
+    "/plants/{plant_id}",
+    response_description="prendi un impianto",
+    response_model=Plant,
+    response_model_by_alias=False,
+)
+async def show_plant(id: str):
+    if (
+        plant := plant_collection.find_one({"_id": ObjectId(id)})
+    ) is not None:
+        return plant
+    raise HTTPException(status_code=404, detail=f"Impianto {id} not found")
+
+
 #GET LIST DEGLI IMPIANTI
 @router.get(
     "/plants",
@@ -44,6 +59,33 @@ async def list_plants():
     for plant in plants:
         plant["_id"] = str(plant["_id"])  
     return plants
+
+
+#PUT DI UN IMPIANTO
+@router.put(
+        "/plants/{plant_id}",
+    response_description="modifica impianto",
+    response_model= PlantResponse,
+    #response_model_by_alias=False,
+)
+async def update_plant(plant_id: str, plant: Plant ):
+
+    plant = {
+        k: v for k, v in plant.model_dump().items() if v is not None
+    }
+    
+    updated_plant = plant_collection.update_one(
+                {"_id": ObjectId(plant_id)},
+                {"$set": plant},
+            ) 
+    if updated_plant.modified_count == 1:
+    
+        updated_plant_db = plant_collection.find_one({"_id":ObjectId(plant_id)})
+        updated_plant_db["_id"] = str(updated_plant_db['_id'])
+
+        return PlantResponse(**updated_plant_db)
+    
+    raise HTTPException(status_code=404, detail=f"Impianto {plant_id} not found")
 
 # Post Machinery
 @router.post(
@@ -64,6 +106,27 @@ async def create_machinery(plant_id:str, machinery: Machinery = Body(...)):
     )
     return created_machinery
 
+#Get by id Machinery
+@router.get("/machineries/{machinery_id}", response_model=Machinery)
+async def get_machineries_by_id(machinery_id: str):
+    # Convert plant_id from string to ObjectId
+    try:
+        machinery_id = ObjectId(machinery_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid ObjectId format")
+
+    # Query the plant collection by _id
+    machinery = machinery_collection.find_one({"_id": machinery_id})
+    
+    if machinery is None:
+        raise HTTPException(status_code=404, detail="Machinary not found")
+    
+    # Convert ObjectId to string for the response
+    machinery["id"] = str(machinery["_id"])  # MongoDB returns _id, we want id in response
+    del machinery["_id"]  # Optionally remove the _id field if you only want the 'id'
+    
+    return machinery
+
 
 #GET LIST DEI MACCHINARI DI UN IMPIANTO
 @router.get(
@@ -73,10 +136,41 @@ async def create_machinery(plant_id:str, machinery: Machinery = Body(...)):
     response_model_by_alias=True,
 )
 async def list_machineries(plant_id: str):
+    
+    try:
+        plant_id = ObjectId(plant_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Invalid ObjectId format")
     machineries = list(machinery_collection.find({"plant_id": plant_id}).to_list(1000))
-    for machinery in machineries:
-        machinery["_id"] = str(machinery["_id"])  
+    
+    if machineries is None:
+        raise HTTPException(status_code=404, detail="Machinary not found")
     return machineries
+
+#PUT DI UN MACCHINARIO
+@router.put(
+        "/machinery/{machinery_id}",
+    response_description="modifica macchinario",
+    response_model= MachineryResponse,
+    #response_model_by_alias=False,
+)
+async def update_machinery(machinery_id: str, machinery: Machinery ):
+
+    machinery = {
+        k: v for k, v in machinery.model_dump().items() if v is not None
+    }
+    
+    updated_machinery = machinery_collection.update_one(
+                {"_id": ObjectId(machinery_id)},
+                {"$set": machinery},
+            ) 
+    
+    if updated_machinery.modified_count == 1:
+    
+        updated_machinery_db = machinery_collection.find_one({"_id":ObjectId(machinery_id)})
+        updated_machinery_db["_id"] = str(updated_machinery_db['_id'])
+    
+        return MachineryResponse(**updated_machinery_db)
 
 #All Macchinari
 @router.get(
@@ -126,31 +220,6 @@ def delete_machinery(machinery_id: str):
     return {"message": "Machinery with ID: {} deleted successfully".format(machinery_id)}
 
 
-
-# # POST Route to create new machinery
-@router.post(
-    "/plants/{plants_id}/machinery",
-    response_description="Add new machinery",
-    response_model=Machinery,
-    status_code=status.HTTP_200_OK,
-)
-def create_machinery(machinery: Machinery = Body(...)):
-    new_machinery = machinery_collection.insert_one(
-        machinery.model_dump(exclude=["id"], by_alias=True)  # Exclude 'id' for insertion
-    )
-    created_machinery = machinery_collection.find_one({"_id": new_machinery.inserted_id})
-    return created_machinery
-
-
-# # GET Route to list all plants (asynchronous)
-# # @router.get(
-# #     "/plants",
-# #     response_description="List all plants",
-# #     response_model=list[Plant],  # List of Plant models
-# # )
-# async def list_plants():
-#     plants = await plant_collection.find().to_list(1000)  # Retrieve up to 1000 plants
-#     return [convert_objectid_to_str(plant) for plant in plants]  # Convert ObjectId to str for each plant
 
 # GET Route to read a specific user by username and password
 @router.post("/user/", response_model=UserResponse, status_code=status.HTTP_200_OK)

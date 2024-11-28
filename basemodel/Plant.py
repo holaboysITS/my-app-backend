@@ -10,15 +10,15 @@ class Plant(BaseModel):
     #id: str = Field(alias="_id", default=None)
     name: str
     location: str
-    description: str
-    machineries: list[str]
+    description: Optional[str]=None
+    machineries: Optional[list[str]] = []
     
 class PlantResponse(BaseModel):
     id: str = Field(alias="_id", default=None)
     name: str
     location: str
-    description: str
-    machineries: list[str]
+    description: Optional[str]=None
+    machineries: Optional[list[str]] = []
 
     # @field_validator('name')
     # def name_validator(cls, value, info):

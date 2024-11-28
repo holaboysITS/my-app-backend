@@ -11,7 +11,7 @@ class MachineryResponse(BaseModel):
     name : str
     type : str
     status : Status
-    specifications : dict
+    specifications : Optional[dict] = {}
 
 
 class Machinery(BaseModel):
@@ -21,7 +21,7 @@ class Machinery(BaseModel):
     name : str
     type : str
     status : Status
-    specifications : dict
+    specifications : Optional[dict] = {}
     
     # @field_validator('plant_id')
     # def check_plant_id(cls, v):
