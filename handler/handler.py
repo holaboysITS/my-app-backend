@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Body, status, Query
 from bson import ObjectId
 from db import user_collection, machinery_collection, plant_collection
-from basemodel.Plant import Plant
-from basemodel.Machinery import Machinery
+from basemodel.Plant import Plant, PlantResponse
+from basemodel.Machinery import Machinery, MachineryResponse
 from basemodel.UserResponse import UserResponse
 from basemodel.User import User
 from typing import List
@@ -35,17 +35,43 @@ async def create_plant(plant: Plant = Body(...)):
 #GET LIST DEGLI IMPIANTI
 @router.get(
     "/plants",
-    response_description="List all students",
-    response_model=List[Plant],
-    response_model_by_alias=False,
+    response_description="List all plants",
+    response_model=List[PlantResponse],
+    response_model_by_alias=True,
 )
 async def list_plants():
-    
-    return list(plant_collection.find().to_list(1000))
+    plants = list(plant_collection.find().to_list(1000))
+    for plant in plants:
+        plant["_id"] = str(plant["_id"])  
+    return plants
+
+# Post Machinery
+@router.post(
+    "/machineries",
+    response_description="Add new machinery",
+    response_model=Machinery,
+    status_code=status.HTTP_200_OK,
+)
+async def create_machinery(machinery: Machinery = Body(...)):
+    new_machinery = machinery_collection.insert_one(
+        machinery.model_dump(exclude=["id"], by_alias=True)  # Exclude 'id' for insertion
+    )
+    created_machinery = machinery_collection.find_one({"_id": new_machinery.inserted_id})
+    return created_machinery
 
 
-
-
+#GET LIST DEI MACCHINARI DI UN IMPIANTO
+@router.get(
+    "/machineries/{plant_id}",
+    response_description="List all machineries from a plant",
+    response_model=List[MachineryResponse],
+    response_model_by_alias=True,
+)
+async def list_machineries(id: str):
+    machineries = list(machinery_collection.find().to_list(1000))
+    for machinery in machineries:
+        machinery["_id"] = str(machinery["_id"])  
+    return machineries
 
 
 
@@ -120,21 +146,21 @@ def read_user(input: User):
     
 #     return response
 
-@router.post("/machinaries/", response_model=Machinery, status_code=status.HTTP_200_OK)
-def read_machineries(input:Machinery):
+# @router.post("/machinaries/", response_model=Machinery, status_code=status.HTTP_200_OK)
+# def read_machineries(input:Machinery):
     
-    plant_id = input.plant_id
-    name = input.name
-    type = input.type
-    specifications = input.specifications
+#     plant_id = input.plant_id
+#     name = input.name
+#     type = input.type
+#     specifications = input.specifications
     
-    machinery= machinery_collection.find_one({'plant_id': plant_id, 'name': name, 'type':type, 'specifications': specifications})
+#     machinery= machinery_collection.find_one({'plant_id': plant_id, 'name': name, 'type':type, 'specifications': specifications})
     
-    if machinery is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plant not found")
-    response = Machinery(plant_id=machinery['plant_id'],name= machinery['name'], type=machinery['type'], specifications=machinery['specifications'])
+#     if machinery is None:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Plant not found")
+#     response = Machinery(plant_id=machinery['plant_id'],name= machinery['name'], type=machinery['type'], specifications=machinery['specifications'])
     
-    return response
+#     return response
 
 # @router.post("/plants")
 # async def create_plant(input:Plant):

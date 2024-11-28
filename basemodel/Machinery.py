@@ -2,15 +2,31 @@ from bson import ObjectId
 from pydantic import BaseModel, Field,field_validator
 from typing import Optional,Annotated
 from basemodel.enums.Status import Status
+from db import user_collection, machinery_collection, plant_collection
 
-class Machinery(BaseModel):
-    # id: Optional[ObjectId] = Field(alias="_id", default=None)
+class MachineryResponse(BaseModel):
+    id: str = Field(alias="_id", default=None)
     plant_id: str
     
     name : str
     type : str
     status : Status
     specifications : dict
+
+
+class Machinery(BaseModel):
+    #id: str = Field(alias="_id", default=None)
+    plant_id: str
+    
+    name : str
+    type : str
+    status : Status
+    specifications : dict
+    
+    # @field_validator('plant_id')
+    # def check_plant_id(cls, v):
+        
+
     
     @field_validator('name')
     def check_name(cls, v):

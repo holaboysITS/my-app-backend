@@ -1,13 +1,20 @@
-from dataclasses import Field
+#from dataclasses import Field
 from typing import Optional
 from requests import Session, session
 from bson import ObjectId
-from pydantic import BaseModel, field_validator, validator
+from pydantic import BaseModel, Field,field_validator, validator
 
 from basemodel.Machinery import Machinery     
 
 class Plant(BaseModel):
-    # id: Optional[ObjectId] = Field(alias="_id", default=None)
+    #id: str = Field(alias="_id", default=None)
+    name: str
+    location: str
+    description: str
+    machineries: list[str]
+    
+class PlantResponse(BaseModel):
+    id: str = Field(alias="_id", default=None)
     name: str
     location: str
     description: str
