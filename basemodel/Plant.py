@@ -20,6 +20,13 @@ class PlantResponse(BaseModel):
     description: Optional[str]=None
     machineries: Optional[list[str]] = []
 
+class PlantResponse2(BaseModel):
+    id: str = Field(alias="_id", default=None)
+    name: str
+    location: str
+    description: Optional[str]=None
+    machineries: Optional[list[Machinery]] = []
+
     # @field_validator('name')
     # def name_validator(cls, value, info):
     #     if not value:

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Body, status, Query
 from bson import ObjectId
 from db import user_collection, machinery_collection, plant_collection
-from basemodel.Plant import Plant, PlantResponse
+from basemodel.Plant import Plant, PlantResponse, PlantResponse2
 from basemodel.Machinery import Machinery, MachineryResponse
 from basemodel.UserResponse import UserResponse
 from basemodel.User import User
@@ -51,13 +51,17 @@ async def show_plant(id: str):
 @router.get(
     "/plants",
     response_description="List all plants",
-    response_model=List[PlantResponse],
+    response_model=List[PlantResponse2],
     response_model_by_alias=True,
 )
 async def list_plants():
     plants = plant_collection.find().to_list(1000)
     for plant in plants:
-        plant["_id"] = str(plant["_id"])  
+        plant["_id"] = str(plant["_id"])
+
+    for plant in plants:
+        plant["machineries"] = [await get_machineries_by_id(i) for i in plant["machineries"]]
+
     return plants
 
 
