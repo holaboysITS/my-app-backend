@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Body, status, Query
 from bson import ObjectId
 from db import user_collection, machinery_collection, plant_collection
 from basemodel.Plant import Plant, PlantResponse
-from basemodel.Machinery import Machinery, MachineryResponse, MachineryInput
+from basemodel.Machinery import Machinery, MachineryResponse
 from basemodel.UserResponse import UserResponse
 from basemodel.User import User
 from typing import List
