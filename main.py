@@ -1,5 +1,5 @@
 #U CAN CONNECT TO THE SERVER, YOU STILL NEED TO GET AN AUTH URI FROM MONGODB CLUSTERfrom fastapi import FastAPI
-from handler.handler import router
+from Handler.handler import router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
