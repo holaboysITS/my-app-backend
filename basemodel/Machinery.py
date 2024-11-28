@@ -12,11 +12,18 @@ class MachineryResponse(BaseModel):
     type : str
     status : Status
     specifications : dict
+    
+class MachineryInput(BaseModel):   
+    name : str
+    type : str
+    status : Status
+    specifications : dict
+    
 
 
 class Machinery(BaseModel):
     #id: str = Field(alias="_id", default=None)
-    plant_id: str
+    plant_id: str | None = None
     
     name : str
     type : str

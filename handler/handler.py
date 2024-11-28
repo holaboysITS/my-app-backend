@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Body, status, Query
 from bson import ObjectId
 from db import user_collection, machinery_collection, plant_collection
 from basemodel.Plant import Plant, PlantResponse
-from basemodel.Machinery import Machinery, MachineryResponse
+from basemodel.Machinery import Machinery, MachineryResponse, MachineryInput
 from basemodel.UserResponse import UserResponse
 from basemodel.User import User
 from typing import List
@@ -47,19 +47,19 @@ async def list_plants():
 
 # Post Machinery
 @router.post(
-    "/{plant_id}/machineries",
+    "/machineries",
     response_description="Add new machinery",
     response_model=Machinery,
     status_code=status.HTTP_200_OK,
 )
-async def create_machinery(plant_id:str, machinery: Machinery = Body(...)):
+async def create_machinery(machinery: Machinery = Body(...)):
     new_machinery = machinery_collection.insert_one(
         machinery.model_dump(exclude=["id"], by_alias=True)  # Exclude 'id' for insertion
     )
     created_machinery = machinery_collection.find_one({"_id": new_machinery.inserted_id})
     
     plant_collection.update_one(
-        {"_id":ObjectId(plant_id)},
+        {"_id":ObjectId(machinery.plant_id)},
         {"$push": {"machineries": str(new_machinery.inserted_id)}}
     )
     return created_machinery
