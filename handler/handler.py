@@ -41,7 +41,7 @@ async def create_plant(plant: Plant = Body(...)):
 )
 async def show_plant(id: str):
     if (
-        plant := plant_collection.find_one({"_id": ObjectId(id)})
+        plant := plant_collection.find_one({"_id": ObjectId(id)}) #walrus operator, if a variable is present, then it uses it TRUST ME :)
     ) is not None:
         return plant
     raise HTTPException(status_code=404, detail=f"Impianto {id} not found")
@@ -55,7 +55,7 @@ async def show_plant(id: str):
     response_model_by_alias=True,
 )
 async def list_plants():
-    plants = list(plant_collection.find().to_list(1000))
+    plants = plant_collection.find().to_list(1000)
     for plant in plants:
         plant["_id"] = str(plant["_id"])  
     return plants
@@ -128,7 +128,7 @@ async def get_machineries_by_id(machinery_id: str):
     return machinery
 
 
-#GET LIST DEI MACCHINARI DI UN IMPIANTO
+#GET LIST PLANT MACHINARIES
 @router.get(
     "/machineries/{plant_id}/plant",
     response_description="List all machineries from a plant",
@@ -141,13 +141,13 @@ async def list_machineries(plant_id: str):
         plant_id_format = ObjectId(plant_id)
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid ObjectId format")
-    machineries = list(machinery_collection.find({"plant_id": plant_id}).to_list(1000))
+    machineries = machinery_collection.find({"plant_id": plant_id}).to_list(1000)
 
     if not machineries:
         raise HTTPException(status_code=404, detail="Patatina")
     return machineries
 
-#PUT DI UN MACCHINARIO
+#PUT MACHINARY
 @router.put(
         "/machinery/{machinery_id}",
     response_description="modifica macchinario",
@@ -180,14 +180,14 @@ async def update_machinery(machinery_id: str, machinery: Machinery ):
     response_model_by_alias=True,
 )
 async def list_machineries():
-    machineries = list(machinery_collection.find().to_list(1000))
+    machineries = machinery_collection.find().to_list(1000)
     for machinery in machineries:
         machinery["_id"] = str(machinery["_id"])  
     return machineries
 #Delete all P
 @router.delete("/plants" , status_code=status.HTTP_200_OK)
 def delete_plant():
-    plants = list(plant_collection.find().to_list(1000))
+    plants = plant_collection.find().to_list(1000)
     for plant in plants:
         plant_collection.find_one_and_delete(plant)
     
@@ -195,7 +195,7 @@ def delete_plant():
 #Delete all M
 @router.delete("/machinaries" , status_code=status.HTTP_200_OK)
 def delete_machinery():
-    machinerys = list(machinery_collection.find().to_list(1000))
+    machinerys = machinery_collection.find().to_list(1000)
     for machinery in machinerys:
         machinery_collection.find_one_and_delete(machinery)
     
@@ -235,6 +235,22 @@ def read_user(input: User):
     response = UserResponse(username=user['username'])
     
     return response
+
+@router.get(
+    "/user",
+    response_model=List[UserResponse],
+    status_code=status.HTTP_200_OK,
+    response_model_by_alias=True,
+    ) #DO NOT IMPLEMENT IN FRONTEND
+def get_all_users():
+
+    result: List[UserResponse] = list(user_collection.find())
+
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No users registered and we don't even have a registration form so we basically have to ask our db admin to put some more users in")
+    return result
+
+
 
 
 
