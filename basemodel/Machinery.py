@@ -13,7 +13,8 @@ class MachineryResponse(BaseModel):
     status : Status
     specifications : Optional[dict] = {}
     
-class Machinery(BaseModel):   
+class Machinery(BaseModel):
+    plant_id: str
     name : str
     type : str
     status : Status

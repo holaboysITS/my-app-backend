@@ -176,7 +176,7 @@ async def update_machinery(machinery_id: str, machinery: Machinery ):
 @router.get(
     "/machineries",
     response_description="List of all machineries",
-    response_model=List[MachineryResponse],
+    response_model=List[Machinery],
     response_model_by_alias=True,
 )
 async def list_machineries():
