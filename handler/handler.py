@@ -51,7 +51,7 @@ async def show_plant(id: str):
 @router.get(
     "/plants",
     response_description="List all plants",
-    response_model=List[PlantResponse2],
+    response_model=List[PlantResponse],
     response_model_by_alias=True,
 )
 async def list_plants():
@@ -59,8 +59,8 @@ async def list_plants():
     for plant in plants:
         plant["_id"] = str(plant["_id"])
 
-    for plant in plants:
-        plant["machineries"] = [await get_machineries_by_id(i) for i in plant["machineries"]]
+    # for plant in plants:
+    #     plant["machineries"] = [await get_machineries_by_id(i) for i in plant["machineries"]]
 
     return plants
 
@@ -215,13 +215,24 @@ def delete_plant(plant_id: str):
 
 
 
-@router.delete("/machinaries/{machinery_id}" , status_code=status.HTTP_200_OK)
+@router.delete("/deleteMachinariesById/{machinery_id}" , status_code=status.HTTP_200_OK)
 def delete_machinery(machinery_id: str):
     machinery = machinery_collection.find_one({"_id": ObjectId(machinery_id)})
     if machinery is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Machinery not found")
-    machinery_collection.delete_one({"_id": ObjectId(machinery_id)})
-    return {"message": "Machinery with ID: {} deleted successfully".format(machinery_id)}
+    
+    plant_id = machinery['plant_id']
+
+    deleted = machinery_collection.delete_one({"_id": ObjectId(machinery_id)})
+    if deleted.deleted_count == 1:
+        if plant_id:
+            plant_collection.update_one(
+                {'_id': ObjectId(plant_id)},
+                {'$pull': {'machinery': machinery_id}}
+            )
+        return {"message": "Machinery with ID: {} deleted successfully".format(machinery_id)}
+    else:
+        raise HTTPException(status_code=404, detail="errore che non so")
 
 
 
