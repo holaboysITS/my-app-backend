@@ -11,7 +11,7 @@ class User(BaseModel):
         
         if v==None or v=='':
             raise ValueError("Lo username non può essere vuoto")
-        elif len(v)<6:
+        elif len(v)<5:
             raise ValueError("Lo username deve avere come minimo 6 caratteri")
         elif len(v)>16:
             raise ValueError("Lo username è troppo lungo")
