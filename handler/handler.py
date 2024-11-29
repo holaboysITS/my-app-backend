@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Body, status, Query
 from bson import ObjectId
 from db import user_collection, machinery_collection, plant_collection
 from basemodel.Plant import Plant, PlantResponse, PlantResponse2
-from basemodel.Machinery import Machinery, MachineryResponse
+from basemodel.Machinery import Machinery, MachineryEdit, MachineryResponse
 from basemodel.UserResponse import UserResponse
 from basemodel.User import User
 from typing import List
@@ -158,7 +158,7 @@ async def list_machineries(plant_id: str):
     response_model= MachineryResponse,
     #response_model_by_alias=False,
 )
-async def update_machinery(machinery_id: str, machinery: Machinery ):
+async def update_machinery(machinery_id: str, machinery: MachineryEdit ):
 
     machinery = {
         k: v for k, v in machinery.model_dump().items() if v is not None

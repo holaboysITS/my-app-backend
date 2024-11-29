@@ -49,3 +49,10 @@ class Machinery(BaseModel):
         if v==None or v=='':
             raise ValueError("Non trovo le specifiche")
         return v
+    
+class MachineryEdit(BaseModel):
+    plant_id: Optional[str] = None 
+    name: Optional[str] = None 
+    type: Optional[str] = None
+    status: Optional[Status] = None
+    specifications: Optional[dict] = {}
